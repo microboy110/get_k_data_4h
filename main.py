@@ -128,8 +128,8 @@ async def fetch_binance_data(symbol: str, is_init=False):
     async with httpx.AsyncClient() as client:
         # 2. 并行请求 K线 和 持仓数据
         tasks = [
-            get_data(client, f"{fapi}/fapi/v1/klines", {"symbol": symbol, "interval": "1h", "limit": 200}, "K线"),
-            get_data(client, f"{data_api}/openInterestHist", {"symbol": symbol, "period": "1h", "limit": 200}, "持仓")
+            get_data(client, f"{fapi}/fapi/v1/klines", {"symbol": symbol, "interval": "4h", "limit": 200}, "K线"),
+            get_data(client, f"{data_api}/openInterestHist", {"symbol": symbol, "period": "4h", "limit": 200}, "持仓")
         ]
         klines_raw, oi_raw = await asyncio.gather(*tasks)
 
@@ -256,7 +256,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     open_time = info['openTime']
                     current_ms = int(time.time() * 1000)
                     elapsed_minutes = (current_ms - open_time) / (60 * 1000)
-                    estimated_klines = int(elapsed_minutes / 60)  # 每60分钟一根
+                    estimated_klines = int(elapsed_minutes / 240)  # 每240分钟一根
 
                     if estimated_klines < 90:
                         print(f"[SKIP] Symbol {s} too new: only ~{estimated_klines} klines expected (<90)")
